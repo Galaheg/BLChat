@@ -24,7 +24,7 @@ def startsv(mac):
     global server
     global client, check
     server = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)  # RFCOMM specific protocol
-    server.bind(("bc:54:2f:8b:78:55", 4))  # MAC Address and Channel 4 bc:54:2f:8b:78:55
+    server.bind((mac, 4))  # MAC Address and Channel 4 bc:54:2f:8b:78:55
     server.listen(1)  # 1 adet cihaz
     check = True
     print("Waiting for connection...")
@@ -50,7 +50,9 @@ def startsv(mac):
             if not data:
                 break
             came = data.decode('utf-8')
-            ui.setTxt()
+            ui.txtController(1)
+            ui.setTxt(came)
+            ui.txtController(0)
             print(f"Received: {came}")
 
             #message = ui.getMessage()

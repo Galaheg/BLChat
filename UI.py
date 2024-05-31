@@ -3,6 +3,9 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 import scanner as sc
 import serverBL as sv
 import clientBL as cl
+import server_mac_address as sv_mac
+
+nameDevice = None
 
 
 def listDevices(listbox):
@@ -15,14 +18,17 @@ def listDevices(listbox):
 
 
 def on_list_click(event):
+    global nameDevice
     # Listbox'ta tıklanan öğenin değerini al
     selected_item = listbox.get(listbox.curselection())
     # Entry kutusuna tıklanan öğenin değerini yerleştir
     macEntry.delete(0, tk.END)
     macEntry.insert(0, selected_item.split()[0])
+    nameDevice = selected_item.split("-")[1]
 
 
 def open_client_window():
+    global txt
     root.withdraw()  # Ana pencereyi gizle
     chatWindow = tk.Toplevel(root)
     window_width = 665
@@ -37,7 +43,7 @@ def open_client_window():
     chatWindow.title("Client")
     chatWindow.protocol("WM_DELETE_WINDOW", lambda: close_window(chatWindow))
 
-    cl.threaded(macEntry)
+    cl.threaded(macEntry.get())
     BG_GRAY = "#ABB2B9"
     BG_COLOR = "#17202A"
     TEXT_COLOR = "#EAECEE"
@@ -46,28 +52,40 @@ def open_client_window():
     FONT_BOLD = "Helvetica 13 bold"
 
     # Send function
-    def send():
+    def send(event=None):
         get = "You(Client) -> " + e.get()
+        txtController(1)
         txt.insert(tk.END, "\n" + get)
-        cl.sendMessage(e.get())
-        # get = e.get().lower()
+        txtController(0)
+        word = e.get()
         e.delete(0, tk.END)
+        cl.sendMessage(word)
+        # get = e.get().lower()a
+
 
     lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=20,
                       height=1).grid(
         row=0)
 
-    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60)
+    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60, state=tk.DISABLED)
     txt.grid(row=1, column=0, columnspan=2)
+    txt.config(state=tk.DISABLED)
 
     scrollbar = tk.Scrollbar(txt)
     scrollbar.place(relheight=1, relx=0.974)
 
     e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=55)
     e.grid(row=2, column=0)
+    e.bind('<Return>', send)
 
-    send = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
+    sendButton = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
                      command=send).grid(row=2, column=1)
+
+def txtController(integer):
+    if integer == 1:
+        txt.config(state=tk.NORMAL)
+    else:
+        txt.config(state=tk.DISABLED)
 
 def open_server_window():
     global txt
@@ -84,7 +102,9 @@ def open_server_window():
     chatWindow.resizable(False, False)
     chatWindow.title("Server")
     chatWindow.protocol("WM_DELETE_WINDOW", lambda: close_window(chatWindow))
-    sv.threaded(macEntry)
+    serverMac = sv_mac.get_bluetooth_mac_windows()
+    print(serverMac)
+    sv.threaded(serverMac)
     BG_GRAY = "#ABB2B9"
     BG_COLOR = "#17202A"
     TEXT_COLOR = "#EAECEE"
@@ -92,44 +112,47 @@ def open_server_window():
     FONT = "Helvetica 14"
     FONT_BOLD = "Helvetica 13 bold"
 
-
     # Send function
-    def send():
+    def send(event=None):
         get = "You(Server) -> " + e.get()
+        txtController(1)
         txt.insert(tk.END, "\n" + get)
-        sv.sendMessage(e.get())
-        #get = e.get().lower()
+        txtController(0)
+        word = e.get()
         e.delete(0, tk.END)
+        sv.sendMessage(word)
+        # get = e.get().lower()
 
     lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=20,
                       height=1).grid(
         row=0)
 
-
     txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60)
     txt.grid(row=1, column=0, columnspan=2)
+    txt.config(state=tk.DISABLED)
 
     scrollbar = tk.Scrollbar(txt)
     scrollbar.place(relheight=1, relx=0.974)
 
     e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=55)
     e.grid(row=2, column=0)
-
-    send = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
+    e.bind('<Return>', send)
+    sendButton = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
                      command=send).grid(row=2, column=1)
 
+
 def setTxt(message):
-    txt.insert(tk.END, "\n" + "client: " + message)
+    global nameDevice
+    txt.insert(tk.END, "\n" + "Friend: " + message)
+
+
 def close_window(window):
     window.destroy()  # Yeni pencereyi kapatir
     if sv.returnCheck() == True:
         sv.stop()
         sv.resetChange()
+    window.destroy()
     root.deiconify()  # Ana pencereyi tekrar göster
-
-
-def chatNow(message):
-    print("ANANNANAN")
 
 
 # init
