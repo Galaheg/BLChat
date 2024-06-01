@@ -4,7 +4,7 @@ import scanner as sc
 import serverBL as sv
 import clientBL as cl
 import server_mac_address as sv_mac
-
+from tkinter import ttk
 nameDevice = None
 
 
@@ -31,7 +31,7 @@ def open_client_window():
     global txt
     root.withdraw()  # Ana pencereyi gizle
     chatWindow = tk.Toplevel(root)
-    window_width = 665
+    window_width = 650
     window_height = 610
     ws = chatWindow.winfo_screenwidth()  # width of the screen
     hs = chatWindow.winfo_screenheight()  # height of the screen
@@ -62,36 +62,34 @@ def open_client_window():
         cl.sendMessage(word)
         # get = e.get().lower()a
 
+    lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=65,
+                      height=1).grid(row=0)
 
-    lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=20,
-                      height=1).grid(
-        row=0)
-
-    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60, state=tk.DISABLED)
+    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=57, state=tk.DISABLED)
     txt.grid(row=1, column=0, columnspan=2)
     txt.config(state=tk.DISABLED)
 
-    scrollbar = tk.Scrollbar(txt)
+    style = ttk.Style()
+    style.theme_use('classic')
+    style.configure("Vertical.TScrollbar", background="red", bordercolor="red", arrowcolor="blue")
+
+    scrollbar = ttk.Scrollbar(txt)
     scrollbar.place(relheight=1, relx=0.974)
 
-    e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=55)
+    e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=52)
     e.grid(row=2, column=0)
+    e.place(x=10, y=580)
     e.bind('<Return>', send)
 
     sendButton = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
-                     command=send).grid(row=2, column=1)
-
-def txtController(integer):
-    if integer == 1:
-        txt.config(state=tk.NORMAL)
-    else:
-        txt.config(state=tk.DISABLED)
+                     command=send)
+    sendButton.place(x=590, y=575)
 
 def open_server_window():
     global txt
     root.withdraw()  # Ana pencereyi gizle
     chatWindow = tk.Toplevel(root)
-    window_width = 665
+    window_width = 650
     window_height = 610
     ws = chatWindow.winfo_screenwidth()  # width of the screen
     hs = chatWindow.winfo_screenheight()  # height of the screen
@@ -105,6 +103,7 @@ def open_server_window():
     serverMac = sv_mac.get_bluetooth_mac_windows()
     print(serverMac)
     sv.threaded(serverMac)
+
     BG_GRAY = "#ABB2B9"
     BG_COLOR = "#17202A"
     TEXT_COLOR = "#EAECEE"
@@ -123,23 +122,36 @@ def open_server_window():
         sv.sendMessage(word)
         # get = e.get().lower()
 
-    lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=20,
-                      height=1).grid(
-        row=0)
+    lable1 = tk.Label(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, text="Welcome", font=FONT_BOLD, pady=10, width=65,
+                      height=1).grid(row=0)
 
-    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=60)
-    txt.grid(row=1, column=0, columnspan=2)
+    txt = tk.Text(chatWindow, bg=BG_COLOR, fg=TEXT_COLOR, font=FONT, width=57)
+    txt.grid(row=1, column=0, columnspan=1)
     txt.config(state=tk.DISABLED)
 
-    scrollbar = tk.Scrollbar(txt)
+    style = ttk.Style()
+    style.theme_use('classic')
+    style.configure("Vertical.TScrollbar", background="red", bordercolor="red", arrowcolor="blue")
+
+    scrollbar = ttk.Scrollbar(txt)
     scrollbar.place(relheight=1, relx=0.974)
 
-    e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=55)
-    e.grid(row=2, column=0)
-    e.bind('<Return>', send)
-    sendButton = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
-                     command=send).grid(row=2, column=1)
 
+    e = tk.Entry(chatWindow, bg="#2C3E50", fg=TEXT_COLOR, font=FONT, width=52)
+    e.grid(row=2, column=0)
+    e.place(x=10, y=580)
+    e.bind('<Return>', send)
+
+    sendButton = tk.Button(chatWindow, text="Send", font=FONT_BOLD, bg=BG_GRAY,
+                     command=send)
+    sendButton.place(x=590, y=575)
+
+
+def txtController(integer):
+    if integer == 1:
+        txt.config(state=tk.NORMAL)
+    else:
+        txt.config(state=tk.DISABLED)
 
 def setTxt(message):
     global nameDevice
